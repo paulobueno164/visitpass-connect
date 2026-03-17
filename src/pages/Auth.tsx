@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Shield, ArrowRight } from "lucide-react";
 
 export default function Auth() {
+  const { user, loading: authLoading } = useAuth(false);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,16 +18,7 @@ export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // If already logged in, redirect based on role
-  useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        await redirectByRole(session.user.id);
-      }
-    });
-  }, []);
-
-  const redirectByRole = async (userId: string) => {
+  const redirectByRole = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("user_roles")
       .select("role")
@@ -36,7 +29,13 @@ export default function Auth() {
     } else {
       navigate("/dashboard");
     }
-  };
+  }, [navigate]);
+
+  // Redirect when context has user (avoids race: no navigate before AuthProvider updates)
+  useEffect(() => {
+    if (authLoading || !user) return;
+    redirectByRole(user.id);
+  }, [authLoading, user, redirectByRole]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +45,7 @@ export default function Auth() {
       if (isLogin) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        await redirectByRole(data.user.id);
+        // Do not navigate here: wait for onAuthStateChange to update context, then useEffect above will redirect
       } else {
         const { error } = await supabase.auth.signUp({
           email,

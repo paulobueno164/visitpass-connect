@@ -32,10 +32,13 @@ export default function AnalystDashboard() {
 
   const fetchRequests = async () => {
     // Analysts see requests for their assigned municipalities via RLS
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("visitation_requests")
       .select("*")
       .order("created_at", { ascending: false });
+    // #region agent log
+    fetch('http://127.0.0.1:7252/ingest/3ced64f8-0e5d-4805-8835-d741af6a0d7f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AnalystDashboard.tsx:fetchRequests',message:'fetch result',data:{count:data?.length??0,error:error?.message??null},timestamp:Date.now(),hypothesisId:'H1,H2,H3'})}).catch(()=>{});
+    // #endregion
     setRequests(data || []);
     setLoadingData(false);
   };
