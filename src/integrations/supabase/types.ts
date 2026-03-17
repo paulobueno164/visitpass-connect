@@ -14,16 +14,288 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analyst_municipalities: {
+        Row: {
+          id: string
+          municipality_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          municipality_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          municipality_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analyst_municipalities_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipalities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      municipalities: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          state: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          state?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          state?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          birth_date: string | null
+          city: string | null
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          state: string | null
+          street: string | null
+          updated_at: string
+          user_id: string
+          zip_code: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          state?: string | null
+          street?: string | null
+          updated_at?: string
+          user_id: string
+          zip_code?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          state?: string | null
+          street?: string | null
+          updated_at?: string
+          user_id?: string
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      request_dependents: {
+        Row: {
+          birth_date: string
+          created_at: string
+          document_number: string
+          full_name: string
+          id: string
+          request_id: string
+        }
+        Insert: {
+          birth_date: string
+          created_at?: string
+          document_number: string
+          full_name: string
+          id?: string
+          request_id: string
+        }
+        Update: {
+          birth_date?: string
+          created_at?: string
+          document_number?: string
+          full_name?: string
+          id?: string
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_dependents_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "visitation_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_documents: {
+        Row: {
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          request_id: string
+          uploaded_at: string
+        }
+        Insert: {
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          request_id: string
+          uploaded_at?: string
+        }
+        Update: {
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          request_id?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_documents_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "visitation_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      visitation_requests: {
+        Row: {
+          analyst_user_id: string | null
+          applicant_address: string
+          applicant_birth_date: string
+          applicant_city: string
+          applicant_name: string
+          applicant_state: string
+          applicant_zip: string
+          created_at: string
+          decided_at: string | null
+          has_dependents: boolean
+          id: string
+          inmate_mother_name: string
+          inmate_name: string
+          municipality_id: string | null
+          protocol: string
+          rejection_reason: string | null
+          relationship: string
+          status: Database["public"]["Enums"]["request_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analyst_user_id?: string | null
+          applicant_address: string
+          applicant_birth_date: string
+          applicant_city: string
+          applicant_name: string
+          applicant_state: string
+          applicant_zip: string
+          created_at?: string
+          decided_at?: string | null
+          has_dependents?: boolean
+          id?: string
+          inmate_mother_name: string
+          inmate_name: string
+          municipality_id?: string | null
+          protocol?: string
+          rejection_reason?: string | null
+          relationship: string
+          status?: Database["public"]["Enums"]["request_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analyst_user_id?: string | null
+          applicant_address?: string
+          applicant_birth_date?: string
+          applicant_city?: string
+          applicant_name?: string
+          applicant_state?: string
+          applicant_zip?: string
+          created_at?: string
+          decided_at?: string | null
+          has_dependents?: boolean
+          id?: string
+          inmate_mother_name?: string
+          inmate_name?: string
+          municipality_id?: string | null
+          protocol?: string
+          rejection_reason?: string | null
+          relationship?: string
+          status?: Database["public"]["Enums"]["request_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitation_requests_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipalities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_analyst_for_municipality: {
+        Args: { _municipality_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "analyst" | "citizen"
+      request_status:
+        | "rascunho"
+        | "em_analise"
+        | "aprovado"
+        | "recusado"
+        | "pendente_correcao"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +422,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "analyst", "citizen"],
+      request_status: [
+        "rascunho",
+        "em_analise",
+        "aprovado",
+        "recusado",
+        "pendente_correcao",
+      ],
+    },
   },
 } as const
