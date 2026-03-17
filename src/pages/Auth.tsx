@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,15 +16,37 @@ export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // If already logged in, redirect based on role
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        await redirectByRole(session.user.id);
+      }
+    });
+  }, []);
+
+  const redirectByRole = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const roles = (data || []).map((r) => r.role);
+    if (roles.includes("admin") || roles.includes("analyst")) {
+      navigate("/analista");
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate("/dashboard");
+        await redirectByRole(data.user.id);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
